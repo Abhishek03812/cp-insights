@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String            @id @default(uuid())
+  email         String            @unique
+  passwordHash  String
+  name          String
+  createdAt     DateTime          @default(now())
+  profiles      PlatformProfile[]
+  goals         Goal[]
+  dailyPlans    DailyPlan[]
+}
+
+model PlatformProfile {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform      String          // "Codeforces", "LeetCode", "CodeChef"
+  handle        String
+  currentRating Int             @default(0)
+  maxRating     Int             @default(0)
+  lastSynced    DateTime        @default(now())
+  submissions   Submission[]
+  contests      ContestResult[]
+
+  @@unique([userId, platform])
+}
+
+model Problem {
+  id                String       @id @default(uuid())
+  platform          String
+  platformProblemId String
+  name              String
+  difficultyRating  Int          @default(0)
+  submissions       Submission[]
+  topics            Topic[]      @relation("ProblemTopics")
+  contests          Contest[]    @relation("ContestProblems")
+
+  @@unique([platform, platformProblemId])
+}
+
+model Submission {
+  id              String          @id @default(uuid())
+  profileId       String
+  profile         PlatformProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  problemId       String
+  problem         Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  verdict         String          // "AC", "WA", "TLE", etc.
+  executionTimeMs Int             @default(0)
+  submittedAt     DateTime
+
+  @@index([profileId, problemId])
+}
+
+model Topic {
+  id       String    @id @default(uuid())
+  name     String    @unique // e.g., "Graphs", "DP"
+  problems Problem[] @relation("ProblemTopics")
+}
+
+model Contest {
+  id        String          @id @default(uuid())
+  platform  String
+  name      String
+  startTime DateTime
+  problems  Problem[]       @relation("ContestProblems")
+  results   ContestResult[]
+}
+
+model ContestResult {
+  id           String          @id @default(uuid())
+  profileId    String
+  profile      PlatformProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  contestId    String
+  contest      Contest         @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  rank         Int
+  ratingChange Int
+  newRating    Int
+
+  @@index([profileId, contestId])
+}
+
+model Goal {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description String
+  targetDate  DateTime
+  isCompleted Boolean  @default(false)
+}
+
+model DailyPlan {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  planData  String   // SQLite doesn't support Json type natively, so stringified JSON
+}
