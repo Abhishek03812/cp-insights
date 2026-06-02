@@ -1,69 +1,36 @@
-# CP Insight 🚀
+# CP Insights 🚀
 
-**The Ultimate Analytics Platform for Competitive Programmers**
+A full-stack competitive programming dashboard I built to track my progress across Codeforces and LeetCode in one seamless view. 
 
-CP Insight is a robust, production-ready full-stack application designed to aggregate user data across platforms like Codeforces and LeetCode. It features an advanced mathematical Intelligence Engine to predict future contest ratings, identify weak topics, and generate customized daily practice plans.
+Instead of just showing raw numbers, it uses a custom-built Codeforces Elo algorithm to mathematically predict future ratings, and analyzes problem-solving history to recommend exactly what topics to practice based on current skill level.
 
----
+## ✨ What it actually does
+- **Live Delta Predictor:** I reverse-engineered the Codeforces rating distribution into a calibrated logarithmic curve. Plug in your rank after a contest, and it instantly (and accurately) predicts your rating drop/gain.
+- **Smart Weakness Detection:** It maps your solved problems against rating-specific topic pools. It knows your skill tier, so it won't tell a beginner to practice advanced Segment Trees.
+- **One Clean Dashboard:** A sleek, premium dark-mode UI built from scratch using pure CSS glassmorphism principles and React.
 
-## 🌟 Key Features
-- **Deep Analytics Dashboard:** Premium, responsive UI featuring glassmorphism design, dark mode, and interactive `Recharts` data visualizations.
-- **Asynchronous Data Sync:** Utilizes **BullMQ** and **Redis** to fetch thousands of submissions from Codeforces and LeetCode GraphQL APIs in the background, fully decoupled from the main web server.
-- **Statistical Rating Predictor:** Built-in Node.js math engine that calculates Exponential Moving Averages (EMA) and Simple Linear Regressions to forecast future contest ratings.
-- **Smart Recommendation Engine:** A rule-based heuristic engine that identifies user weaknesses and generates adaptive 3-day cyclic training plans.
-- **Graceful Degradation (Demo Mode):** The frontend gracefully falls back to presentation mock data if the PostgreSQL/Redis backend is offline.
+## 🛠️ Tech Stack
+- **Frontend:** Next.js (React), TypeScript, Recharts, Custom CSS
+- **Backend:** Node.js, Express, Prisma ORM, SQLite
+- **Data Ingestion:** Custom sync workers pulling directly from the Codeforces & LeetCode APIs
 
----
+## 🚀 How to run it locally
 
-## 🏗️ System Architecture & Tech Stack
-- **Frontend:** Next.js (App Router), React, TypeScript, Pure Vanilla CSS (Glassmorphism design system), Recharts.
-- **Backend API:** Node.js, Express.js, TypeScript.
-- **Database:** PostgreSQL accessed via Prisma ORM.
-- **Message Queue & Caching:** Redis powering BullMQ background sync workers.
+Since the backend uses a local SQLite database, there is no messy database configuration required. It runs right out of the box!
 
----
-
-## 🚀 Running the Project Locally
-
-### Prerequisites
-- Node.js (v18+)
-- Docker Desktop (Required for PostgreSQL & Redis)
-
-### 1. Start the Database and Queue
-Open a terminal in the root directory and start the Docker containers:
-```bash
-docker-compose up -d
-```
-*(This starts PostgreSQL on port 5432 and Redis on port 6379)*
-
-### 2. Configure the Backend
-Navigate to the `backend` folder:
+**1. Start the Backend API:**
 ```bash
 cd backend
 npm install
-```
-Push the Prisma schema to the database:
-```bash
 npx prisma db push
-```
-Start the Express server:
-```bash
 npm run dev
 ```
-*(The backend API and BullMQ sync worker are now running on `http://localhost:5000`)*
 
-### 3. Start the Frontend
-Open a new terminal, navigate to the `frontend` folder:
+**2. Start the Frontend Dashboard:**
+Open a new terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Navigate to **`http://localhost:3000/dashboard`** in your browser to view the application!
-
----
-
-## 📂 Project Structure
-* `frontend/`: The Next.js application, including the custom CSS design system and Recharts visualizations.
-* `backend/`: The Express API server, Prisma schema, BullMQ worker configuration, and the Intelligence Engine.
-* `docker-compose.yml`: Local infrastructure configuration for Postgres and Redis.
+Then just open `http://localhost:3000/dashboard` in your browser!
