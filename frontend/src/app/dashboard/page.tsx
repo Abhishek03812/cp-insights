@@ -72,7 +72,7 @@ export default function Dashboard() {
   const fetchAnalytics = async (silent = true) => {
     try {
       const storedUserId = localStorage.getItem('userId') || 'demo';
-      const res = await fetch(`http://localhost:5000/api/analytics/dashboard?userId=${storedUserId}&t=${Date.now()}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/analytics/dashboard?userId=${storedUserId}&t=${Date.now()}`);
       if (!res.ok) throw new Error('Backend unavailable');
       const data = await res.json();
       
@@ -139,14 +139,14 @@ export default function Dashboard() {
     
     try {
       if (cfHandle) {
-        await fetch('http://localhost:5000/api/profiles/sync', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profiles/sync`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, platform: 'Codeforces', handle: cfHandle })
         });
       }
       if (lcHandle) {
-        await fetch('http://localhost:5000/api/profiles/sync', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profiles/sync`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, platform: 'LeetCode', handle: lcHandle })
